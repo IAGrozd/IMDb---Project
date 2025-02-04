@@ -3,10 +3,9 @@
 #include <iomanip>
 using namespace std;
 
-// Constants for file paths
+
 const char MOVIES_FILE[] = "movies.txt";
 
-// Movie structure
 struct Movie {
     char* title;
     int year;
@@ -14,10 +13,9 @@ struct Movie {
     char* director;
     char* actors;
     float rating;
-    int ratingCount; // Number of users who rated the movie
+    int ratingCount;
 };
 
-// Function declarations
 void showAdminMenu(Movie*& movies, int& movieCount, int& capacity);
 void showUserMenu(Movie*& movies, int& movieCount);
 void addMovie(Movie*& movies, int& movieCount, int& capacity);
@@ -28,19 +26,19 @@ void changeMovie(Movie* movies, int movieCount);
 void deleteMovie(Movie*& movies, int& movieCount);
 void rateMovie(Movie* movies, int movieCount);
 void sortMovies(Movie* movies, int movieCount);
-void filterMoviesByRating(Movie* movies, int movieCount);
+void filterByRating(Movie* movies, int movieCount);
 void loadMovies(Movie*& movies, int& movieCount, int& capacity);
 void saveMovies(Movie* movies, int movieCount);
-bool substringSearch(const char* str, const char* sub);
-char* allocateAndCopy(const char* source);
-void resizeMoviesArray(Movie*& movies, int& capacity);
+bool substrSearch(const char* str, const char* sub);
+char* copyStr(const char* source);
+void resizeMoviesArr(Movie*& movies, int& capacity);
 char* createStr();
+float setPrecision(float);
 
-// Main function
 int main() {
     Movie* movies = nullptr;
     int movieCount = 0;
-    int capacity = 2; // Initial capacity for the dynamic array
+    int capacity = 5;
     movies = new Movie[capacity];
 
     loadMovies(movies, movieCount, capacity);
@@ -53,7 +51,7 @@ int main() {
         cout << "Enter your choice: ";
         int choice;
         cin >> choice;
-        cin.ignore(); // Clear input buffer
+        cin.ignore(); 
 
         switch (choice) {
         case 1:
@@ -73,44 +71,50 @@ int main() {
     }
 }
 
+float setPrecision(float rate) {
+    int num = rate * 10;
+    rate = num / 10;
+    return rate;
+}
+
 char* createStr() {
-    int capacity = 50; // Initial capacity
-    int size = 0;      // Current size of the string
-    char* str = new char[capacity]; // Dynamically allocate memory
-    str[0] = '\0';     // Initialize with an empty string+
+    int capacity = 50; 
+    int size = 0;      
+    char* str = new char[capacity]; 
+    str[0] = '\0';     
 
     while (true) {
         char ch;
-        ch = cin.get(); // Read one character, including spaces
+        ch = cin.get(); 
 
-        // Stop input on Enter (newline character)
+        
         if (ch == '\n') {
             break;
         }
 
-        // Resize if necessary
+        
         if (size + 1 >= capacity) {
-            capacity *= 2; // Double the capacity
+            capacity *= 2; 
             char* newStr = new char[capacity];
 
-            // Copy old content to the new array
-            for (int i = 0; i < size; ++i) {
+            
+            for (int i = 0; i < size; i++) {
                 newStr[i] = str[i];
             }
 
-            delete[] str; // Free old memory
-            str = newStr; // Point to the new array
+            delete[] str; 
+            str = newStr; 
         }
 
-        // Append the character to the array
+        
         str[size++] = ch;
-        str[size] = '\0'; // Null-terminate the string
+        str[size] = '\0'; 
     }
 
-    return str; // Return the dynamically allocated char array
+    return str; 
 }
 
-// Function to display the admin menu
+
 void showAdminMenu(Movie*& movies, int& movieCount, int& capacity) {
     while (true) {
         cout << "\nAdministrator Menu:\n";
@@ -158,7 +162,7 @@ void showAdminMenu(Movie*& movies, int& movieCount, int& capacity) {
     }
 }
 
-// Function to display the user menu
+
 void showUserMenu(Movie*& movies, int& movieCount) {
     while (true) {
         cout << "\nRegular User Menu:\n";
@@ -187,7 +191,7 @@ void showUserMenu(Movie*& movies, int& movieCount) {
             rateMovie(movies, movieCount);
             break;
         case 5:
-            filterMoviesByRating(movies, movieCount);
+            filterByRating(movies, movieCount);
             break;
         case 6:
             return;
@@ -197,14 +201,13 @@ void showUserMenu(Movie*& movies, int& movieCount) {
     }
 }
 
-// Function to add a new movie
+
 void addMovie(Movie*& movies, int& movieCount, int& capacity) {
     if (movieCount >= capacity) {
-        resizeMoviesArray(movies, capacity);
+        resizeMoviesArr(movies, capacity);
     }
 
     Movie newMovie;
-    char buffer[256];
 
     cout << "Enter movie title: ";
     newMovie.title = createStr();
@@ -229,20 +232,20 @@ void addMovie(Movie*& movies, int& movieCount, int& capacity) {
     cout << "Movie added successfully!\n";
 }
 
-// Function to search for a movie by title
+
 void searchByTitle(Movie* movies, int movieCount) {
     cout << "Enter title or part of the title to search: ";
     char* searchedTitle = createStr();
 
     bool found = false;
-    for (int i = 0; i < movieCount; ++i) {
-        if (substringSearch(movies[i].title, searchedTitle)) {
+    for (int i = 0; i < movieCount; i++) {
+        if (substrSearch(movies[i].title, searchedTitle)) {
             cout << "\nTitle: " << movies[i].title << "\n"
                 << "Year: " << movies[i].year << "\n"
                 << "Genre: " << movies[i].genre << "\n"
                 << "Director: " << movies[i].director << "\n"
                 << "Actors: " << movies[i].actors << "\n"
-                << "Rating: " << fixed << setprecision(1) << movies[i].rating << "\n";
+                << "Rating: " << movies[i].rating << "\n";
             found = true;
         }
     }
@@ -252,15 +255,15 @@ void searchByTitle(Movie* movies, int movieCount) {
     }
 }
 
-// Helper function to allocate and copy a string
-char* allocateAndCopy(const char* source) {
+
+char* copyStr(const char* source) {
     int length = 0;
     while (source[length] != '\0') {
-        ++length;
+        length++;
     }
 
     char* newString = new char[length + 1];
-    for (int i = 0; i < length; ++i) {
+    for (int i = 0; i < length; i++) {
         newString[i] = source[i];
     }
     newString[length] = '\0';
@@ -273,14 +276,14 @@ void searchByGenre(Movie* movies, int movieCount) {
     char* searchedGenre = createStr();
 
     bool found = false;
-    for (int i = 0; i < movieCount; ++i) {
-        if (substringSearch(movies[i].genre, searchedGenre)) {
+    for (int i = 0; i < movieCount; i++) {
+        if (substrSearch(movies[i].genre, searchedGenre)) {
             cout << "\nTitle: " << movies[i].title << "\n"
                 << "Year: " << movies[i].year << "\n"
                 << "Genre: " << movies[i].genre << "\n"
                 << "Director: " << movies[i].director << "\n"
                 << "Actors: " << movies[i].actors << "\n"
-                << "Rating: " << fixed << setprecision(1) << movies[i].rating << "\n";
+                << "Rating: " << movies[i].rating << "\n";
             found = true;
         }
     }
@@ -296,13 +299,13 @@ void browseMovies(Movie* movies, int movieCount) {
         return;
     }
 
-    for (int i = 0; i < movieCount; ++i) {
+    for (int i = 0; i < movieCount; i++) {
         cout << "\nTitle: " << movies[i].title << "\n"
             << "Year: " << movies[i].year << "\n"
             << "Genre: " << movies[i].genre << "\n"
             << "Director: " << movies[i].director << "\n"
             << "Actors: " << movies[i].actors << "\n"
-            << "Rating: " << fixed << setprecision(1) << movies[i].rating << "\n";
+            << "Rating: " << movies[i].rating << "\n";
     }
 }
 
@@ -310,18 +313,18 @@ void deleteMovie(Movie*& movies, int& movieCount) {
     cout << "Enter the title of the movie to delete: ";
     char* delMovie = createStr();
 
-    for (int i = 0; i < movieCount; ++i) {
-        if (substringSearch(movies[i].title, delMovie)) {
+    for (int i = 0; i < movieCount; i++) {
+        if (substrSearch(movies[i].title, delMovie)) {
             delete[] movies[i].title;
             delete[] movies[i].genre;
             delete[] movies[i].director;
             delete[] movies[i].actors;
 
-            for (int j = i; j < movieCount - 1; ++j) {
+            for (int j = i; j < movieCount - 1; j++) {
                 movies[j] = movies[j + 1];
             }
 
-            --movieCount;
+            movieCount--;
             cout << "Movie deleted successfully.\n";
             return;
         }
@@ -333,10 +336,10 @@ void deleteMovie(Movie*& movies, int& movieCount) {
 void rateMovie(Movie* movies, int movieCount) {
     
     cout << "Enter the title of the movie to rate: ";
-    char* titleToDel = createStr();
+    char* titleToRate = createStr();
 
-    for (int i = 0; i < movieCount; ++i) {
-        if (substringSearch(movies[i].title, titleToDel)) {
+    for (int i = 0; i < movieCount; i++) {
+        if (substrSearch(movies[i].title, titleToRate)) {
             cout << "Enter your rating (1-10): ";
             float userRating;
             cin >> userRating;
@@ -348,7 +351,9 @@ void rateMovie(Movie* movies, int movieCount) {
             }
 
             movies[i].rating = ((movies[i].rating * movies[i].ratingCount) + userRating) / (movies[i].ratingCount + 1);
-            ++movies[i].ratingCount;
+            movies[i].ratingCount++;
+
+            movies[i].rating = setPrecision(movies[i].rating);
 
             cout << "Thank you for rating the movie.\n";
             return;
@@ -358,21 +363,21 @@ void rateMovie(Movie* movies, int movieCount) {
     cout << "Movie not found.\n";
 }
 
-void filterMoviesByRating(Movie* movies, int movieCount) {
+void filterByRating(Movie* movies, int movieCount) {
     cout << "Enter minimum rating to filter movies: ";
     float minRating;
     cin >> minRating;
     cin.ignore();
 
     bool found = false;
-    for (int i = 0; i < movieCount; ++i) {
+    for (int i = 0; i < movieCount; i++) {
         if (movies[i].rating >= minRating) {
             cout << "\nTitle: " << movies[i].title << "\n"
                 << "Year: " << movies[i].year << "\n"
                 << "Genre: " << movies[i].genre << "\n"
                 << "Director: " << movies[i].director << "\n"
                 << "Actors: " << movies[i].actors << "\n"
-                << "Rating: " << fixed << setprecision(1) << movies[i].rating << "\n";
+                << "Rating: " << movies[i].rating << "\n";
             found = true;
         }
     }
@@ -382,10 +387,10 @@ void filterMoviesByRating(Movie* movies, int movieCount) {
     }
 }
 
-bool substringSearch(const char* str, const char* sub) {
-    for (int i = 0; str[i] != '\0'; ++i) {
+bool substrSearch(const char* str, const char* sub) {
+    for (int i = 0; str[i] != '\0'; i++) {
         bool match = true;
-        for (int j = 0; sub[j] != '\0'; ++j) {
+        for (int j = 0; sub[j] != '\0'; j++) {
             if (str[i + j] == '\0' || str[i + j] != sub[j]) {
                 match = false;
                 break;
@@ -398,22 +403,22 @@ bool substringSearch(const char* str, const char* sub) {
     return false;
 }
 
-// Function to change an existing movie's details
+
 void changeMovie(Movie* movies, int movieCount) {
     cout << "Enter the title of the movie to change: ";
     char* movieToChange = createStr();
 
-    for (int i = 0; i < movieCount; ++i) {
-        if (substringSearch(movies[i].title, movieToChange)) {
+    for (int i = 0; i < movieCount; i++) {
+        if (substrSearch(movies[i].title, movieToChange)) {
             cout << "\nEditing Movie: " << movies[i].title << "\n";
 
             cout << "Enter new title (leave empty to keep current): ";
             char* newTitle = createStr();
-            ;
             if (newTitle[0] != '\0') {
                 delete[] movies[i].title;
-                movies[i].title = allocateAndCopy(newTitle);
+                movies[i].title = copyStr(newTitle);
             }
+            delete[] newTitle;
 
             cout << "Enter new release year (0 to keep current): ";
             int newYear;
@@ -423,29 +428,29 @@ void changeMovie(Movie* movies, int movieCount) {
                 movies[i].year = newYear;
             }
 
-            cout << "Enter new genre (leave empty to keep current): ";
-            char newGenre[256];
-            cin.getline(newGenre, 256);
+            cout << "Enter new genre (press Enter to keep current): ";
+            char* newGenre = createStr();
             if (newGenre[0] != '\0') {
                 delete[] movies[i].genre;
-                movies[i].genre = allocateAndCopy(newGenre);
+                movies[i].genre = copyStr(newGenre);
             }
+            delete[] newGenre;
 
-            cout << "Enter new director (leave empty to keep current): ";
-            char newDirector[256];
-            cin.getline(newDirector, 256);
+            cout << "Enter new director (press Enter to keep current): ";
+            char* newDirector = createStr();
             if (newDirector[0] != '\0') {
                 delete[] movies[i].director;
-                movies[i].director = allocateAndCopy(newDirector);
+                movies[i].director = copyStr(newDirector);
             }
+            delete[] newDirector;
 
-            cout << "Enter new actors (leave empty to keep current): ";
-            char newActors[256];
-            cin.getline(newActors, 256);
+            cout << "Enter new actors (press Enter to keep current): ";
+            char* newActors = createStr();
             if (newActors[0] != '\0') {
                 delete[] movies[i].actors;
-                movies[i].actors = allocateAndCopy(newActors);
+                movies[i].actors = copyStr(newActors);
             }
+            delete[] newActors;
 
             cout << "Enter new rating (1-10 or 0 to keep current): ";
             float newRating;
@@ -459,7 +464,7 @@ void changeMovie(Movie* movies, int movieCount) {
                     cout << "Invalid rating. Keeping the current rating.\n";
                 }
             }
-
+            
             cout << "Movie details updated successfully!\n";
             return;
         }
@@ -468,17 +473,17 @@ void changeMovie(Movie* movies, int movieCount) {
     cout << "Movie not found.\n";
 }
 
-// Function to resize the movies array when it's full
-void resizeMoviesArray(Movie*& movies, int& capacity) {
+
+void resizeMoviesArr(Movie*& movies, int& capacity) {
     int newCapacity = capacity * 2;
     Movie* newMovies = new Movie[newCapacity];
 
-    // Copy the existing movies to the new array
-    for (int i = 0; i < capacity; ++i) {
+   
+    for (int i = 0; i < capacity; i++) {
         newMovies[i] = movies[i];
     }
 
-    // Delete the old array and point to the new one
+    
     delete[] movies;
     movies = newMovies;
     capacity = newCapacity;
@@ -486,7 +491,7 @@ void resizeMoviesArray(Movie*& movies, int& capacity) {
     cout << "Movies array resized to capacity " << capacity << ".\n";
 }
 
-// Function to save the movies to a file
+
 void saveMovies(Movie* movies, int movieCount) {
     ofstream file(MOVIES_FILE);
     if (!file) {
@@ -494,7 +499,7 @@ void saveMovies(Movie* movies, int movieCount) {
         return;
     }
 
-    for (int i = 0; i < movieCount; ++i) {
+    for (int i = 0; i < movieCount; i++) {
         file << movies[i].title << "\n"
             << movies[i].year << "\n"
             << movies[i].genre << "\n"
@@ -507,7 +512,7 @@ void saveMovies(Movie* movies, int movieCount) {
     cout << "Movies saved successfully.\n";
 }
 
-// Function to load movies from a file
+
 void loadMovies(Movie*& movies, int& movieCount, int& capacity) {
     ifstream file(MOVIES_FILE);
     if (!file) {
@@ -518,42 +523,42 @@ void loadMovies(Movie*& movies, int& movieCount, int& capacity) {
     char buffer[256];
     while (file.getline(buffer, 256)) {
         if (movieCount >= capacity) {
-            resizeMoviesArray(movies, capacity);
+            resizeMoviesArr(movies, capacity);
         }
 
-        movies[movieCount].title = allocateAndCopy(buffer);
+        movies[movieCount].title = copyStr(buffer);
 
         file >> movies[movieCount].year;
-        file.ignore(); // To ignore the newline character after the year
+        file.ignore(); //to ignore '\n'
 
         file.getline(buffer, 256);
-        movies[movieCount].genre = allocateAndCopy(buffer);
+        movies[movieCount].genre = copyStr(buffer);
 
         file.getline(buffer, 256);
-        movies[movieCount].director = allocateAndCopy(buffer);
+        movies[movieCount].director = copyStr(buffer);
 
         file.getline(buffer, 256);
-        movies[movieCount].actors = allocateAndCopy(buffer);
+        movies[movieCount].actors = copyStr(buffer);
 
         file >> movies[movieCount].rating;
         file >> movies[movieCount].ratingCount;
-        file.ignore(); // To ignore the newline character after the rating count
+        file.ignore();
 
-        ++movieCount;
+        movieCount++;
     }
 
     cout << "Movies loaded successfully.\n";
 }
 
-// Function to sort movies by rating (descending order)
 void sortMovies(Movie* movies, int movieCount) {
-    for (int i = 0; i < movieCount - 1; ++i) {
-        for (int j = i + 1; j < movieCount; ++j) {
+    for (int i = 0; i < movieCount - 1; i++) {
+        for (int j = i + 1; j < movieCount; j++) {
             if (movies[i].rating < movies[j].rating) {
-                // Swap movies[i] and movies[j]
+         
                 Movie temp = movies[i];
                 movies[i] = movies[j];
                 movies[j] = temp;
+
             }
         }
     }
@@ -561,4 +566,4 @@ void sortMovies(Movie* movies, int movieCount) {
     cout << "Movies sorted by rating (descending).\n";
 }
 
-// Function to filter movies by rating
+
